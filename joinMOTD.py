@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from daycount import getday
 
 msgstart = '=====Welcome back to TIS====='
