@@ -11,5 +11,5 @@ def onPlayerJoin(server, player):
   msg += '今天是' + servername + '开服的第' + getday() + '天\n'
   for line in msg.splitlines():
     server.tell(player, line)
-  server.execute('tellraw ' + player + '{"text":"点击此处进入创造服","clickEvent":{"action":"run_command","value":"/server creative"}}')
-  server.execute('tellraw ' + player + '{"text":"点击此处列出任务列表","clickEvent":{"action":"run_command","value":"!!task list"}}')
+  server.execute('tellraw ' + player + ' {"text":"点击此处进入创造服","clickEvent":{"action":"run_command","value":"/server creative"}}')
+  server.execute('tellraw ' + player + ' {"text":"点击此处列出任务列表","clickEvent":{"action":"run_command","value":"!!task list"}}')
