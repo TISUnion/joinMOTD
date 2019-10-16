@@ -27,9 +27,9 @@ def onPlayerJoin(server, player):
       cmd = cmd + getJumpCommand(name)
       if i != len(lines) - 1:
         cmd = cmd + ',{"text":" "},'
+  cmd = cmd + ']}'
 
 # print all stuffs
-  cmd = cmd + ']}'
   msg = '''§7=======§r Welcome back to §e''' + serverName + ''' §7=======§r
 今天是§e''' + mainServerName + '''§r开服的第§e''' + getday() + '''§r天
 §7-------§r Server List §7-------§r'''
