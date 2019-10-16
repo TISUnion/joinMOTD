@@ -18,7 +18,8 @@ def onPlayerJoin(server, player):
   cmd = 'tellraw ' + player + ' {"text":"","extra":['
   with open(subserverNameListPath, 'r') as f:
     js = json.load(f)
-    servername = str(js["serverName"])
+    serverName = str(js["serverName"])
+    mainServerName = str(js["mainServerName"])
     lines = js["serverList"]
     
     for i in range(len(lines)):
@@ -29,9 +30,9 @@ def onPlayerJoin(server, player):
 
 # print all stuffs
   cmd = cmd + ']}'
-  msg = '''§7==========§r Welcome back to §e''' + servername + ''' §7==========§r
-今天是§e''' + servername + '''§r开服的第§e''' + getday() + '''§r天
-§7----------§r Server List §7----------§r'''
+  msg = '''§7=======§r Welcome back to §e''' + serverName + ''' §7=======§r
+今天是§e''' + mainServerName + '''§r开服的第§e''' + getday() + '''§r天
+§7-------§r Server List §7-------§r'''
   tellMessage(server, player, msg)
   server.execute(cmd)
   
