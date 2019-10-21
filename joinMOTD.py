@@ -3,7 +3,10 @@
 from daycount import getday
 import json
 
-subserverNameListPath = 'plugins/joinMOTD/setting.json'
+PluginName = 'joinMOTD'
+Prefix = '!!joinMOTD'
+ConfigFileFolder = 'config/'
+ConfigFilePath = ConfigFileFolder + PluginName + '.json'
 
 def tellMessage(server, player, msg):
   for line in msg.splitlines():
@@ -16,7 +19,7 @@ def getJumpCommand(subserverName):
 
 def onPlayerJoin(server, player):
   cmd = 'tellraw ' + player + ' {"text":"","extra":['
-  with open(subserverNameListPath, 'r') as f:
+  with open(ConfigFilePath, 'r') as f:
     js = json.load(f)
     serverName = str(js["serverName"])
     mainServerName = str(js["mainServerName"])
@@ -37,5 +40,5 @@ def onPlayerJoin(server, player):
   server.execute(cmd)
   
 def onServerInfo(server, info):
-  if info.content == '!!joinMOTD' and info.isPlayer:
+  if info.content == Prefix and info.isPlayer:
     onPlayerJoin(server, info.player)
