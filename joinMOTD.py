@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import copy
 
 from daycount import getday
 import json
@@ -42,3 +43,8 @@ def onPlayerJoin(server, player):
 def onServerInfo(server, info):
   if info.content == Prefix and info.isPlayer:
     onPlayerJoin(server, info.player)
+
+def on_info(server, info):
+  info2 = copy.deepcopy(info)
+  info2.isPlayer = info2.is_player
+  onServerInfo(server, info2)
