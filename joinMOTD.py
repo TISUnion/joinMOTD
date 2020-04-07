@@ -44,15 +44,22 @@ def onPlayerJoin(server, player):
 '''.strip().format(serverName, mainServerName, getday())
   tellMessage(server, player, msg)
   server.execute(cmd)
-  
+
+
 def onServerInfo(server, info):
   if info.content == Prefix and info.isPlayer:
     onPlayerJoin(server, info.player)
+
 
 def on_info(server, info):
   info2 = copy.deepcopy(info)
   info2.isPlayer = info2.is_player
   onServerInfo(server, info2)
 
+
 def on_player_joined(server, playername):
   onPlayerJoin(server, playername)
+
+
+def on_load(server, old):
+  server.add_help_message(Prefix, '显示欢迎消息')
