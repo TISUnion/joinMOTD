@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 import copy
+import sys
 
+
+sys.path.append('plugins/')
 from daycount import getday
 import json
 
@@ -34,9 +37,11 @@ def onPlayerJoin(server, player):
   cmd = cmd + ']}'
 
 # print all stuffs
-  msg = '''§7=======§r Welcome back to §e''' + serverName + ''' §7=======§r
-今天是§e''' + mainServerName + '''§r开服的第§e''' + getday() + '''§r天
-§7-------§r Server List §7-------§r'''
+  msg = '''
+§7=======§r Welcome back to §e{}§7 =======§r
+今天是§e{}§r开服的第§e{}§r天
+§7-------§r Server List §7-------§r
+'''.strip().format(serverName, mainServerName, getday())
   tellMessage(server, player, msg)
   server.execute(cmd)
   
