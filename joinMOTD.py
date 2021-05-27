@@ -20,7 +20,11 @@ def get_day(server: ServerInterface):
 		api = server.get_plugin_instance(pid)
 		if hasattr(api, 'getday') and callable(api.getday):
 			return api.getday()
-	return '?'
+	try:
+		import daycount
+		return daycount.getday()
+	except:
+		return '?'
 
 
 def on_player_joined(server: ServerInterface, player, info):
