@@ -1,62 +1,51 @@
-# -*- coding: utf-8 -*-
+import json
 import os
+
+from mcdreforged.api.all import *
 
 PLUGIN_METADATA = {
 	'id': 'join_motd',
-	'version': '1.0.0',
+	'version': '1.1.0',
 	'name': 'Join MOTD Display',
 	'author': 'Fallen_Breath',
 	'link': 'https://github.com/TISUnion/joinMOTD'
 }
 
-from daycount import getday
-import json
-
-PluginName = 'joinMOTD'
 Prefix = '!!joinMOTD'
-ConfigFileFolder = 'config/'
-ConfigFilePath = ConfigFileFolder + PluginName + '.json'
+ConfigFilePath = os.path.join('config', 'joinMOTD.json')
 
 
-def tellMessage(server, player, msg):
-	for line in msg.splitlines():
-		server.tell(player, line)
+def get_day(server: ServerInterface):
+	for pid in ('mcd_daycount', 'day_count_reforged', 'daycount_nbt'):
+		api = server.get_plugin_instance(pid)
+		if hasattr(api, 'getday') and callable(api.getday):
+			return api.getday()
+	return '?'
 
 
-def getJumpCommand(subserverName):
-	return '{"text":"[' + subserverName + ']",\
-"clickEvent":{"action":"run_command",\
-"value":"/server ' + subserverName + '"}}'
-
-
-def on_player_joined(server, player, info):
-	cmd = 'tellraw ' + player + ' {"text":"","extra":['
+def on_player_joined(server: ServerInterface, player, info):
+	message = RTextList()
 	with open(ConfigFilePath, 'r') as f:
 		js = json.load(f)
-		serverName = str(js["serverName"])
-		mainServerName = str(js["mainServerName"])
-		lines = js["serverList"]
+	server_name = str(js["serverName"])
+	main_server_name = str(js["mainServerName"])
+	lines = js["serverList"]
+	for i in range(len(lines)):
+		subServerName = lines[i]
+		command = '/server {}'.format(subServerName)
+		message.append(RText('[{}]'.format(subServerName)).h(command).c(RAction.run_command, command))
+		if i != len(lines) - 1:
+			message.append(' ')
 
-		for i in range(len(lines)):
-			name = lines[i].replace('\n', '').replace('\r', '')
-			cmd = cmd + getJumpCommand(name)
-			if i != len(lines) - 1:
-				cmd = cmd + ',{"text":" "},'
-	cmd = cmd + ']}'
-
-	# print all stuffs
-	msg = '''
-§7=======§r Welcome back to §e{}§7 =======§r
-今天是§e{}§r开服的第§e{}§r天
-§7-------§r Server List §7-------§r
-'''.strip().format(serverName, mainServerName, getday())
-	tellMessage(server, player, msg)
-	server.execute(cmd)
+	server.tell(player, '§7=======§r Welcome back to §e{}§7 =======§r'.format(server_name))
+	server.tell(player, '今天是§e{}§r开服的第§e{}§r天'.format(main_server_name, get_day(server)))
+	server.tell(player, '§7-------§r Server List §7-------§r')
+	server.tell(player, message)
 
 
 def on_user_info(server, info):
 	if info.content == Prefix:
-		on_player_joined(server, info.player, info)
+		on_player_joined(server, info.player, None)
 
 
 def on_load(server, old):
@@ -68,4 +57,3 @@ def on_load(server, old):
 				"mainServerName": "?",
 				"serverList": []
 			}, f, indent=4)
-
