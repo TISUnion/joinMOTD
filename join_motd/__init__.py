@@ -1,16 +1,31 @@
+import collections
 import os
 from datetime import datetime
-from typing import List, Optional, Callable, Any, Union
+from typing import List, Optional, Callable, Any, Union, Dict
 
 from mcdreforged.api.all import *
+
+
+class ServerInfo(Serializable):
+	name: str
+	description: Optional[str] = None
+	category: str = ''
+
+	@classmethod
+	def from_object(cls, obj) -> 'ServerInfo':
+		if isinstance(obj, cls):
+			return obj
+		return ServerInfo(name=str(obj))
 
 
 class Config(Serializable):
 	serverName: str = 'Survival Server'
 	mainServerName: str = 'My Server'
-	serverList: List[str] = [
-		"survival",
-		"lobby"
+	serverList: List[Union[str, ServerInfo]] = [
+		'survival',
+		'lobby',
+		ServerInfo(name='creative1', description='CMP Server#1', category='CMP'),
+		ServerInfo(name='creative2', description='CMP Server#2', category='CMP'),
 	]
 	start_day: Optional[str] = None
 	daycount_plugin_ids: List[str] = [
@@ -45,15 +60,24 @@ def get_day(server: ServerInterface) -> str:
 
 
 def display_motd(server: ServerInterface, reply: Callable[[Union[str, RTextBase]], Any]):
-	messages = []
-	for subServerName in config.serverList:
-		command = '/server {}'.format(subServerName)
-		messages.append(RText('[{}]'.format(subServerName)).h(command).c(RAction.run_command, command))
-
 	reply('§7=======§r Welcome back to §e{}§7 =======§r'.format(config.serverName))
 	reply('今天是§e{}§r开服的第§e{}§r天'.format(config.mainServerName, get_day(server)))
 	reply('§7-------§r Server List §7-------§r')
-	reply(RTextBase.join(' ', messages))
+
+	server_dict: Dict[str, List[ServerInfo]] = collections.defaultdict(list)
+	for entry in config.serverList:
+		info = ServerInfo.from_object(entry)
+		server_dict[info.category].append(info)
+	for category, server_list in server_dict.items():
+		header = RText('{}: '.format(category) if len(category) > 0 else '')
+		messages = []
+		for info in server_list:
+			command = '/server {}'.format(info.name)
+			hover_text = command
+			if info.description is not None:
+				hover_text = info.description + '\n' + hover_text
+			messages.append(RText('[{}]'.format(info.name)).h(hover_text).c(RAction.run_command, command))
+		reply(header + RTextBase.join(' ', messages))
 
 
 def on_player_joined(server: ServerInterface, player, info):
