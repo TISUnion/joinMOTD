@@ -1,4 +1,5 @@
 import collections
+import json
 import os
 from datetime import datetime
 from typing import List, Optional, Callable, Any, Union, Dict
@@ -21,6 +22,7 @@ class ServerInfo(Serializable):
 
 class Config(Serializable):
 	serverName: str = 'Survival Server'
+	commonJsonDataPath: Optional[str] = None
 	mainServerName: str = 'My Server'
 	serverList: List[Union[str, ServerInfo]] = [
 		'survival',
@@ -89,5 +91,16 @@ def on_player_joined(server: ServerInterface, player, info):
 def on_load(server: PluginServerInterface, old):
 	global config
 	config = server.load_config_simple(file_name=ConfigFilePath, in_data_folder=False, target_class=Config)
+	if config.commonJsonDataPath is not None:
+		try:
+			with open(config.commonJsonDataPath, 'r', encoding='utf8') as f:
+				common_config_json = json.load(f)
+
+			new_config_json = config.serialize()
+			new_config_json.update(common_config_json)
+			config = Config.deserialize(new_config_json)
+		except Exception as e:
+			server.logger.error('Load common config json from {!r} failed: {}'.format(config.commonJsonDataPath, e))
+
 	server.register_help_message(Prefix, '显示欢迎消息')
 	server.register_command(Literal(Prefix).runs(lambda src: display_motd(src.get_server(), src.reply)))

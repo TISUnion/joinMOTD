@@ -9,5 +9,8 @@
 	"author": [
 		"Fallen_Breath"
 	],
-	"link": "https://github.com/TISUnion/joinMOTD"
+	"link": "https://github.com/TISUnion/joinMOTD",
+    "dependencies": {
+        "mcdreforged": ">=2.9.0"
+    }
 }
