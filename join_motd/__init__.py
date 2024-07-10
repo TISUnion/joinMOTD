@@ -8,6 +8,7 @@ from mcdreforged.api.all import *
 
 class ServerInfo(Serializable):
 	name: str
+	display: Optional[str] = None
 	description: Optional[str] = None
 	category: str = ''
 
@@ -76,7 +77,8 @@ def display_motd(server: ServerInterface, reply: Callable[[Union[str, RTextBase]
 			hover_text = command
 			if info.description is not None:
 				hover_text = info.description + '\n' + hover_text
-			messages.append(RText('[{}]'.format(info.name)).h(hover_text).c(RAction.run_command, command))
+			display_text = info.display or info.name
+			messages.append(RText('[{}]'.format(display_text)).h(hover_text).c(RAction.run_command, command))
 		reply(header + RTextBase.join(' ', messages))
 
 
